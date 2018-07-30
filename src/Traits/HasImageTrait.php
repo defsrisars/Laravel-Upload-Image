@@ -23,8 +23,6 @@ trait HasImageTrait
          */
         static::creating(function ($model) {
 
-            $disk = config('laravel_image_upload.disk');
-
             // 針對 model 上所有使用到 images 的 field
             foreach ($model->imagable as $field) {
                 // 取得欄位
@@ -56,13 +54,13 @@ trait HasImageTrait
                             $dirName = dirname($imgLink);
                             $fileName = basename($imgLink);
                             // 如果檔案不存在硬碟上，或是開頭不是__temp__，直接跳過
-                            if (!Storage::disk($disk)->exists($fileName) || !starts_with($fileName, '__temp__')) {
+                            if (!Storage::disk('public')->exists($fileName) || !starts_with($fileName, '__temp__')) {
                                 continue;
                             } else {
                                 // 如果檔案存在
                                 // 將檔名上的 __temp__ 移除
                                 $newFileName = ltrim($fileName, '__temp__');
-                                Storage::disk($disk)->move($fileName, $newFileName);
+                                Storage::disk('public')->move($fileName, $newFileName);
                                 // 將該欄位中，舊的 link 替換成新的 link
                                 $newLink = $dirName . DIRECTORY_SEPARATOR . $newFileName;
                                 $newHtml = str_replace($imgLink, $newLink, $newHtml);
@@ -75,13 +73,13 @@ trait HasImageTrait
                         $dirName = dirname($content);
                         $fileName = basename($content);
                         // 如果檔案不存在硬碟上，或是開頭不是__temp__，直接跳過
-                        if (!Storage::disk($disk)->exists($fileName) || !starts_with($fileName, '__temp__')) {
+                        if (!Storage::disk('public')->exists($fileName) || !starts_with($fileName, '__temp__')) {
                             continue;
                         } else {
                             // 如果檔案存在
                             // 將檔名上的 __temp__ 移除
                             $newFileName = ltrim($fileName, '__temp__');
-                            Storage::disk($disk)->move($fileName, $newFileName);
+                            Storage::disk('public')->move($fileName, $newFileName);
                             // 將欄位的值更正成沒有 __temp__ 的值
                             $contents[$key] = $dirName . DIRECTORY_SEPARATOR . $newFileName;
                         }
@@ -111,8 +109,6 @@ trait HasImageTrait
          */
         static::deleted(function ($model) {
 
-            $disk = config('laravel_image_upload.disk');
-
             // 針對 model 上所有使用到 images 的 field
             foreach ($model->imagable as $field) {
 
@@ -138,25 +134,25 @@ trait HasImageTrait
                             // 若內容為連結
                             $fileName = basename($imgLink);
                             // 如果檔案不存在硬碟上，或是開頭不是__temp__，直接跳過
-                            if (!Storage::disk($disk)->exists($fileName)) {
+                            if (!Storage::disk('public')->exists($fileName)) {
                                 continue;
                             } else {
                                 // 如果檔案存在
                                 // 將檔名上的 __temp__ 移除
                                 $newFileName = '__temp__' . $fileName;
-                                Storage::disk($disk)->move($fileName, $newFileName);
+                                Storage::disk('public')->move($fileName, $newFileName);
                             }
                         }
                     } else {
                         // 若內容為連結
                         $fileName = basename($content);
                         // 如果檔案不存在硬碟上，或是開頭不是__temp__，直接跳過
-                        if (!Storage::disk($disk)->exists($fileName)) {
+                        if (!Storage::disk('public')->exists($fileName)) {
                             continue;
                         } else {
                             // 如果檔案存在，將檔名上的 __temp__ 補回，由排程刪除
                             $newFileName = '__temp__' . $fileName;
-                            Storage::disk($disk)->move($fileName, $newFileName);
+                            Storage::disk('public')->move($fileName, $newFileName);
                         }
                     }
                 }
@@ -185,8 +181,6 @@ trait HasImageTrait
          */
         static::updated(function ($model) {
 
-            $disk = config('laravel_image_upload.disk');
-
             // 記錄更改數量，有更動才需要 save
             $updateNum = 0;
 
@@ -205,6 +199,11 @@ trait HasImageTrait
                     $old_contents = [$old_contents];
                 }
 
+                // create 觸發的 updating 事件，直接擋下
+                if(empty($old_contents)){
+                    continue;
+                }
+
                 // 將陣列壓成一維陣列
                 $contents = array_dot($contents);
                 $old_contents = array_dot($old_contents);
@@ -219,23 +218,20 @@ trait HasImageTrait
                         preg_match_all('/< *img[^>]*src *= *["\']?([^"\']*)/i', $content, $imgArray);
                         preg_match_all('/< *img[^>]*src *= *["\']?([^"\']*)/i', $old_content, $oldImgArray);
 
-                        // 將所有 img 內 src 的 link，修改 __temp__ 檔名，並更改其在欄位內的值
-                        // 避免一個 html 裡有多個 img ， 所以必須另外宣告參數儲存，不可用 foreach 的 $content
+                        // 檢查新的內容，若含有 __temp__ ，將其去掉 __temp__
                         $newHtml = $content;
                         foreach ($imgArray[1] as $index => $imgLink) {
-                            // 若內容為連結
                             $dirName = dirname($imgLink);
                             $fileName = basename($imgLink);
-                            // 如果檔案不存在硬碟上，或是開頭不是__temp__，直接跳過
-                            if (!Storage::disk($disk)->exists($fileName) || !starts_with($fileName, '__temp__') || $old_content == $content) {
+                            // 如果檔案不存在硬碟上，不處理
+                            // 開頭不是__temp__，表示為已處理之連結
+                            // $old_content == $content 表示雖然有修改，但沒有修改到 img link
+                            if (!Storage::disk('public')->exists($fileName) || !starts_with($fileName, '__temp__')) {
                                 continue;
                             } else {
-                                // 如果檔案存在
-                                // 將新檔名上的 __temp__ 移除
+                                // 將檔名上的 __temp__ 移除
                                 $newFileName = ltrim($fileName, '__temp__');
-                                Storage::disk($disk)->move($fileName, $newFileName);
-                                // 將舊檔名加回 __temp__ 讓排程移除
-                                Storage::disk($disk)->move(basename($oldImgArray[1][$index]), '__temp__' . basename($oldImgArray[1][$index]));
+                                Storage::disk('public')->move($fileName, $newFileName);
                                 // 將該欄位中，舊的 link 替換成新的 link
                                 $newLink = $dirName . DIRECTORY_SEPARATOR . $newFileName;
                                 $newHtml = str_replace($imgLink, $newLink, $newHtml);
@@ -243,6 +239,22 @@ trait HasImageTrait
                                 $updateNum++;
                             }
                         }
+
+                        // 取得原本有，但修改之後沒有的連結 (表示應該被移除)
+                        $oldArray = array_diff($oldImgArray[1], $imgArray[1]);
+
+                        foreach ($oldArray as $index => $imgLink) {
+                            $fileName = basename($imgLink);
+                            // 如果檔案不存在硬碟上，不處理
+                            if (!Storage::disk('public')->exists($fileName)) {
+                                continue;
+                            } else {
+                                // 將舊檔名加回 __temp__ 讓排程移除
+                                Storage::disk('public')->move(basename($imgLink), '__temp__' . basename($imgLink));
+                            }
+                        }
+
+                        // 覆寫 ORM 內容
                         $contents[$key] = $newHtml;
 
                     } else {
@@ -250,15 +262,15 @@ trait HasImageTrait
                         $dirName = dirname($content);
                         $fileName = basename($content);
                         // 如果檔案不存在硬碟上，或是開頭不是__temp__，或是修改前後檔名相同 直接跳過
-                        if (!Storage::disk($disk)->exists($fileName) || !starts_with($fileName, '__temp__') || $old_content == $content) {
+                        if (!Storage::disk('public')->exists($fileName) || !starts_with($fileName, '__temp__') || $old_content == $content) {
                             continue;
                         } else {
                             // 如果檔案存在，有做更動
                             // 將新檔名上的 __temp__ 移除
                             $newFileName = ltrim($fileName, '__temp__');
-                            Storage::disk($disk)->move($fileName, $newFileName);
+                            Storage::disk('public')->move($fileName, $newFileName);
                             // 將舊檔名加回 __temp__ 讓排程移除
-                            Storage::disk($disk)->move(basename($old_content), '__temp__' . basename($old_content));
+                            Storage::disk('public')->move(basename($old_content), '__temp__' . basename($old_content));
                             // 將欄位的值更正成沒有 __temp__ 的值
                             $contents[$key] = $dirName . DIRECTORY_SEPARATOR . $newFileName;
                             // 更動數量 + 1

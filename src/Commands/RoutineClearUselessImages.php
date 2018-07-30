@@ -4,6 +4,7 @@ namespace Ariby\LaravelImageUpload\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 
 class RoutineClearUselessImages extends Command
 {
@@ -24,13 +25,16 @@ class RoutineClearUselessImages extends Command
     {
         logger('---Clear Useless Image Job START at' . date("Y-m-d H:i:s") . '---');
 
-        $disk = config('laravel_image_upload.disk');
-        $path = Storage::disk($disk)->getAdapter()->getPathPrefix();
+        $path = Storage::disk('public')->getAdapter()->getPathPrefix();
 
         $files = glob($path.'__temp__*');
 
+        // 超過一天沒有使用的圖片，刪除
         foreach($files as $file){
-            unlink($file);
+            $fileTime = Carbon::createFromTimestamp(Storage::lastModified('public/'.basename($file)));
+            if($fileTime->diffInDays(Carbon::now()) >= 1){
+                unlink($file);
+            }
         }
 
         logger('---Clear Useless Image Job END at' . date("Y-m-d H:i:s") . '---');

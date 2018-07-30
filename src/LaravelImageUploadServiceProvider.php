@@ -5,6 +5,7 @@ namespace Ariby\LaravelImageUpload;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 use Ariby\LaravelImageUpload\Commands\RoutineClearUselessImages;
+use Illuminate\Support\Facades\Artisan;
 
 class LaravelImageUploadServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,9 @@ class LaravelImageUploadServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/laravel_image_upload.php.php' => config_path('laravel_image_upload.php'),
         ]);
+
+        // 建立連結符號
+        Artisan::call('storage:link');
 
         if ($this->app->runningInConsole()) {
             // 合併套件設定檔
@@ -48,5 +52,10 @@ class LaravelImageUploadServiceProvider extends ServiceProvider
         // 註冊 Intervention\Image 套件
         $this->app->register(\Intervention\Image\ImageServiceProvider::class);
         $loader->alias('Image', \Intervention\Image\Facades\Image::class);
+
+        // 註冊所有 commands
+        $this->commands([
+            RoutineClearUselessImages::class
+        ]);
     }
 }

@@ -61,7 +61,7 @@ class Slider extends Model
     }
 
     /**
-     * 如果有需要，覆寫此 function ，回傳結果必須為
+     * Laravel-Image-Upload，如果有需要，覆寫此 function
      *
      * @param $field
      * @return mixed
@@ -76,14 +76,13 @@ class Slider extends Model
     }
 
     /**
-     * 如果有需要，覆寫此 function，修改存入欄位的方式
+     * Laravel-Image-Upload，如果有需要，覆寫此 function，修改存入欄位的方式
      *
      * @param $field
      * @param $value
      */
     protected function saveImagesField($field, $value)
     {
-
         $this->$field = $value;
     }
 

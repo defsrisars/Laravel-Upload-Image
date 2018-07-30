@@ -20,19 +20,16 @@ class ImageUploadController
         // 上傳之檔案
         $file = $request->file('file');
 
-        // 使用之硬碟名稱
-        $storageName = config('laravel_image_upload.disk');
-
         // 判斷檔名是否重覆
         do {
             // 以 __temp__ + str_random(40) 建立暫時檔名
             $tempRandomName = "__temp__" . str_random(40);
             $basename = $tempRandomName . '.' . $file->guessExtension();
-        } while (Storage::disk($storageName)->exists($basename) || Storage::disk($storageName)->exists(ltrim($basename, '__temp__')));
+        } while (Storage::disk('public')->exists($basename) || Storage::disk('public')->exists(ltrim($basename, '__temp__')));
 
         // 將檔案先上傳
-        $path = $file->storeAs('', $basename, $storageName);
-        $realPath = config("filesystems.disks.$storageName.root") . DIRECTORY_SEPARATOR . basename($path);
+        $path = $file->storeAs('', $basename, 'public');
+        $realPath = config("filesystems.disks.public.root") . DIRECTORY_SEPARATOR . basename($path);
 
         // 將檔案縮圖
         $image = Image::make($realPath);
@@ -57,7 +54,7 @@ class ImageUploadController
         $image->save();
 
         // 取得檔案公開路徑回傳
-        $url = asset(Storage::url(config('laravel_image_upload.image_dir') . DIRECTORY_SEPARATOR . $basename));
+        $url = asset('storage' . DIRECTORY_SEPARATOR . $basename);
 
         return response()
             ->json([
