@@ -21,9 +21,6 @@ class LaravelImageUploadServiceProvider extends ServiceProvider
             __DIR__ . '/../config/laravel_image_upload.php.php' => config_path('laravel_image_upload.php'),
         ]);
 
-        // 建立連結符號
-        Artisan::call('storage:link');
-
         if ($this->app->runningInConsole()) {
             // 合併套件設定檔
             $this->mergeConfigFrom(

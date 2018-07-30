@@ -14,6 +14,12 @@
 
     composer require ariby/laravel-image-upload
     
+然後必須在專案目錄下
+
+    php artisan storage:link
+    
+建立軟連結，可參考 [Laravel 官方文件](https://docs.laravel-dojo.com/laravel/5.5/filesystem#the-public-disk)
+    
 ## 發佈設定檔
 
 在安裝套件後，下 `php artisan vendor:publish` ，並選擇發佈 `Ariby\LaravelImageUpload\LaravelImageUploadServiceProvider`
