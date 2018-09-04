@@ -35,7 +35,7 @@ class LaravelImageUploadServiceProvider extends ServiceProvider
         }
     }
 
-    /**com
+    /**
      * Register any application services.
      *
      * @return void

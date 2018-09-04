@@ -200,7 +200,7 @@ trait HasImageTrait
                 }
 
                 // create 觸發的 updating 事件，直接擋下
-                if(empty($old_contents)){
+                if (empty($old_contents)) {
                     continue;
                 }
 
@@ -310,7 +310,7 @@ trait HasImageTrait
      */
     public function getImagesField($field)
     {
-        return $field;
+        return $this->$field;
     }
 
     /**
