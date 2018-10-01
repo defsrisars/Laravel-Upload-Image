@@ -28,11 +28,12 @@ class LaravelImageUploadServiceProvider extends ServiceProvider
             );
             // 執行所有套件 migrations
             $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-            // 註冊所有 commands
-            $this->commands([
-                RoutineClearUselessImages::class
-            ]);
         }
+
+        // 註冊所有 commands
+        $this->commands([
+            RoutineClearUselessImages::class
+        ]);
     }
 
     /**
