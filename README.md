@@ -141,6 +141,15 @@
     
     }
     
+    
+## 縮圖路由
+
+一旦存入 DB 後，可透過縮圖路由取得縮圖後的圖片，路由規則為`/image/{img}/{size}`，img 為圖片在專案中 storage 資料夾中的檔名，size 組成方式為 w=數字-h=數字
+
+比方說如下連結，會取得寬為 200 ， 高為 300 的縮圖，**若只傳入寬或高，另一屬性將一原圖等比例縮放**
+
+`http://domain/image/I2k9ypuMhMS2WexVoN4nuDeVzOeYHTOZY7JLufLy.jpeg/w=200-h=300`
+    
 ## 排程使用
 
 以下為排程範例
@@ -167,7 +176,7 @@
         {
             ...
             
-            // 每兩天刪除沒有用到的圖片
+            // 檢查刪除沒有用到的圖片
             $schedule->command('RoutineClearUselessImages:check-and-clear')->days(2);
             
             ...
@@ -185,3 +194,5 @@
     ...
     
 呼叫後會刪除所有檔名前綴為  \_\_temp\_\_ 的檔案(表示該檔名沒有被任何資料庫中的欄位所使用)
+
+可在發佈 config 檔後，在 delete_check_days 設定天數，假設 = 1 ，則會刪除 1 天以上沒有使用的__temp__檔名圖片

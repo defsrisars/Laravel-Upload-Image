@@ -51,7 +51,7 @@ trait HasImageTrait
                         $newHtml = $content;
                         foreach ($imgArray[1] as $index => $imgLink) {
                             // 若內容為連結
-                            $dirName = dirname($imgLink);
+//                            $dirName = dirname($imgLink); // 現在只存檔名，避免更換 domain 問題
                             $fileName = basename($imgLink);
                             // 如果檔案不存在硬碟上，或是開頭不是__temp__，直接跳過
                             if (!Storage::disk('public')->exists($fileName) || !starts_with($fileName, '__temp__')) {
@@ -62,7 +62,8 @@ trait HasImageTrait
                                 $newFileName = ltrim($fileName, '__temp__');
                                 Storage::disk('public')->move($fileName, $newFileName);
                                 // 將該欄位中，舊的 link 替換成新的 link
-                                $newLink = $dirName . DIRECTORY_SEPARATOR . $newFileName;
+//                                $newLink = $dirName . DIRECTORY_SEPARATOR . $newFileName; // 現在只存檔名，避免更換 domain 問題
+                                $newLink = $newFileName; // 現在只存檔名，避免更換 domain 問題
                                 $newHtml = str_replace($imgLink, $newLink, $newHtml);
                             }
                         }
@@ -70,7 +71,7 @@ trait HasImageTrait
 
                     } else {
                         // 若內容為連結
-                        $dirName = dirname($content);
+//                        $dirName = dirname($content);
                         $fileName = basename($content);
                         // 如果檔案不存在硬碟上，或是開頭不是__temp__，直接跳過
                         if (!Storage::disk('public')->exists($fileName) || !starts_with($fileName, '__temp__')) {
@@ -81,7 +82,8 @@ trait HasImageTrait
                             $newFileName = ltrim($fileName, '__temp__');
                             Storage::disk('public')->move($fileName, $newFileName);
                             // 將欄位的值更正成沒有 __temp__ 的值
-                            $contents[$key] = $dirName . DIRECTORY_SEPARATOR . $newFileName;
+//                            $contents[$key] = $dirName . DIRECTORY_SEPARATOR . $newFileName; // 現在只存檔名，避免更換 domain 問題
+                            $contents[$key] = $newFileName;
                         }
 
                     }
@@ -215,6 +217,7 @@ trait HasImageTrait
                     if ($model->isHtml($content)) {
                         // 透過正規表達式抓取 html 中的 src
                         // [0] => 含 <img ...>, [1] => 只有 src 裡的內容
+                        // 新的和舊的的差集就是這次還有要保留的
                         preg_match_all('/< *img[^>]*src *= *["\']?([^"\']*)/i', $content, $imgArray);
                         preg_match_all('/< *img[^>]*src *= *["\']?([^"\']*)/i', $old_content, $oldImgArray);
 

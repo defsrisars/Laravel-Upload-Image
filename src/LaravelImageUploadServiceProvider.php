@@ -21,6 +21,9 @@ class LaravelImageUploadServiceProvider extends ServiceProvider
             __DIR__ . '/../config/laravel_image_upload.php.php' => config_path('laravel_image_upload.php'),
         ]);
 
+        // include helpers after 合併套件設定檔
+        $this->includeHelpers();
+
         if ($this->app->runningInConsole()) {
             // 合併套件設定檔
             $this->mergeConfigFrom(
@@ -55,5 +58,16 @@ class LaravelImageUploadServiceProvider extends ServiceProvider
         $this->commands([
             RoutineClearUselessImages::class
         ]);
+    }
+
+    /**
+     * include helpers
+     */
+    protected function includeHelpers()
+    {
+        $file = __DIR__ . '/Helpers/Helper.php';
+        if (file_exists($file)) {
+            require_once($file);
+        }
     }
 }

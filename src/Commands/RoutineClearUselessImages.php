@@ -31,7 +31,7 @@ class RoutineClearUselessImages extends Command
         // 超過一天沒有使用的圖片，刪除
         foreach ($files as $file) {
             $fileTime = Carbon::createFromTimestamp(Storage::lastModified('public/' . basename($file)));
-            if ($fileTime->diffInDays(Carbon::now()) >= 1) {
+            if ($fileTime->diffInDays(Carbon::now()) >= config('laravel_image_upload.delete_check_days')) {
                 unlink($file);
             }
         }
