@@ -144,11 +144,11 @@
     
 ## 縮圖路由
 
-一旦存入 DB 後，可透過縮圖路由取得縮圖後的圖片，路由規則為`/image/{img}/{size}`，img 為圖片在專案中 storage 資料夾中的檔名，size 組成方式為 w=數字-h=數字
+一旦存入 DB 後，可透過縮圖路由取得縮圖後的圖片，路由規則為`/imgfly/{img}/{size?}`，img 為圖片在專案中 storage 資料夾中的檔名，size 組成方式為 w數字&h數字
 
 比方說如下連結，會取得寬為 200 ， 高為 300 的縮圖，**若只傳入寬或高，另一屬性將一原圖等比例縮放**
 
-`http://domain/image/I2k9ypuMhMS2WexVoN4nuDeVzOeYHTOZY7JLufLy.jpeg/w=200-h=300`
+`http://domain/imgfly/I2k9ypuMhMS2WexVoN4nuDeVzOeYHTOZY7JLufLy.jpeg/w200&h300`
     
 ## 排程使用
 

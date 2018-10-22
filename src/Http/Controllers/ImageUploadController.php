@@ -74,13 +74,13 @@ class ImageUploadController
             return \Image::make(public_path("storage/{$img}"))->response('jpg');
         }
 
-        $bp = strpos($size, '-');
+        $bp = strpos($size, '&');
         // 沒有分隔符，表示只有 h 或 w
         if ($bp === false) {
-            $hp = strpos($size, 'h=');
+            $hp = strpos($size, 'h');
             // 找不到 h=
             if ($hp === false) {
-                $wp = strpos($size, 'w=');
+                $wp = strpos($size, 'w');
                 if ($wp === false) {
                     abort(404);
                 } else {
@@ -103,8 +103,8 @@ class ImageUploadController
             // 前半段
             $firstHalf = substr($size, 0, $bp);
 
-            $wp = strpos($firstHalf, 'w=');
-            $hp = strpos($firstHalf, 'h=');
+            $wp = strpos($firstHalf, 'w');
+            $hp = strpos($firstHalf, 'h');
             if ($wp === false && $hp === false) {
                 abort(404);
             }
@@ -118,8 +118,8 @@ class ImageUploadController
             // 後半段
             $lastHalf = substr($size, $bp + 1);
 
-            $wp = strpos($lastHalf, 'w=');
-            $hp = strpos($lastHalf, 'h=');
+            $wp = strpos($lastHalf, 'w');
+            $hp = strpos($lastHalf, 'h');
             if ($wp === false && $hp === false) {
                 abort(404);
             }
