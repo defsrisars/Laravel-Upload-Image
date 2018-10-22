@@ -85,14 +85,14 @@ class ImageUploadController
                     abort(404);
                 } else {
                     // 只有 w
-                    $w = substr($size, $wp + 2);
+                    $w = substr($size, $wp + 1);
                     return \Image::make(public_path("storage/{$img}"))->resize($w, null, function ($constraint) {
                         $constraint->aspectRatio();
                     })->response('jpg');
                 }
             } else {
-                // 只有 h=
-                $h = substr($size, $hp + 2);
+                // 只有 h
+                $h = substr($size, $hp + 1);
                 return \Image::make(public_path("storage/{$img}"))->resize(null, $h, function ($constraint) {
                     $constraint->aspectRatio();
                 })->response('jpg');
@@ -109,10 +109,10 @@ class ImageUploadController
                 abort(404);
             }
             if ($wp !== false) {
-                $w = substr($firstHalf, $wp + 2);
+                $w = substr($firstHalf, $wp + 1);
             }
             if ($hp !== false) {
-                $h = substr($firstHalf, $wp + 2);
+                $h = substr($firstHalf, $wp + 1);
             }
 
             // 後半段
@@ -124,10 +124,10 @@ class ImageUploadController
                 abort(404);
             }
             if ($wp !== false) {
-                $w = substr($lastHalf, $wp + 2);
+                $w = substr($lastHalf, $wp + 1);
             }
             if ($hp !== false) {
-                $h = substr($lastHalf, $wp + 2);
+                $h = substr($lastHalf, $wp + 1);
             }
 
             return \Image::make(public_path("storage/{$img}"))->resize($w, $h)->response('jpg');
