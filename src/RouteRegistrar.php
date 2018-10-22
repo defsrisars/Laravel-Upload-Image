@@ -34,7 +34,7 @@ class RouteRegistrar
         // 註冊圖片上傳的路由
         $this->router->group([], function (RoutingRouter $router) {
             $router->post('/laravel/image-upload', 'ImageUploadController@imgUpload')->name('imgUpload');
-            $router->get('/image/{img}/{size}', 'ImageUploadController@imgThumbnail')->name('imgThumbnail');
+            $router->get('/image/{img}/{size?}', 'ImageUploadController@imgThumbnail')->name('imgThumbnail');
         });
     }
 }

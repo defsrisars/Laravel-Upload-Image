@@ -67,8 +67,13 @@ class ImageUploadController
     }
 
     // 圖片縮圖回傳
-    function imgThumbnail($img, $size)
+    function imgThumbnail($img, $size = null)
     {
+        // 如果沒有傳入 size ，直接回傳原圖
+        if(is_null($size)){
+            return \Image::make(public_path("storage/{$img}"))->response('jpg');
+        }
+
         $bp = strpos($size, '-');
         // 沒有分隔符，表示只有 h 或 w
         if ($bp === false) {
