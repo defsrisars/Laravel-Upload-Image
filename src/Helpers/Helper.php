@@ -1,24 +1,4 @@
 <?php
-if (!function_exists('array_undot')) {
-    /**
-     * Laravel array_dot 的反函式
-     *
-     * @return array
-     */
-    function array_undot($dotNotationArray)
-    {
-        $array = [];
-        foreach ($dotNotationArray as $key) {
-            $array[$key] = null;
-        }
-        $undotArray = [];
-        foreach ($array as $key => $value) {
-            array_set($undotArray, $key, $value);
-        }
-        return $undotArray;
-    }
-}
-
 if (!function_exists('html_img_src_to_basename')) {
     /**
      * 將 html 的 「<img ...>」 字串 src 只留下 basename
@@ -56,7 +36,7 @@ if (!function_exists('html_img_src_to_url')) {
         $dataArray = $imgArray[1];
 
         foreach ($dataArray as $data) {
-            $str = str_replace($data[0], asset('storage/' . $data[0]), $str);
+            $str = str_replace($data[0], asset('imgfly/' . $data[0]), $str);
         }
 
         return $str;
